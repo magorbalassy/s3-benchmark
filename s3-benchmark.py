@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import argparse, boto3, logging, os, shutil, sys
+import time
 
 from threading import Thread
 from queue import Queue
@@ -24,15 +25,8 @@ class S3:
         result.append(item.key)
     return result
 
-  #def upload(self, bucket, local_file, remote_file, prefix):
-  #  self.resource.Bucket(bucket).upload_file(local_file, str(prefix + remote_file))
-
   def put_object(self, bucket, local_file, remote_file, prefix):
     self.resource.Object(bucket, str(prefix + remote_file)).put(Body=local_file)
-    
-  def write_content(self, bucket, content, remote_object, prefix):
-    res = self.resource.Object(bucket, remote_object).put(Body=content, Prefix=prefix)
-    return res
 
   def delete_object(self, bucket, remote_object):
     res = self.resource.Object(bucket, remote_object).delete()
@@ -41,7 +35,7 @@ class S3:
 def random_file(size):
   return os.urandom(size)
 
-def worker():
+def worker(que):
   while not que.empty():
     obj = que.get()
     if args.operation == 'upload':
@@ -51,7 +45,7 @@ def worker():
     que.task_done()
     
 if __name__ == "__main__":
-    logging.basicConfig(filename='s3-benchmark.log', level=logging.DEBUG,
+    logging.basicConfig(filename='s3-benchmark.log', level=logging.WARNING,
                         format='%(asctime)s - %(levelname)s - %(message)s',
                         datefmt='%m/%d/%Y %I:%M:%S %p')
     logging.info('==== Starting new run ====')
@@ -116,5 +110,13 @@ if __name__ == "__main__":
     s3.put_object(args.bucket, random_file(size), 'testfile', prefix)
     que = Queue()
     for i in range(int(args.number)):
-      que.put('testfile' + str(i))
-      
+      que.put('testfile-' + str(i))
+    start_time = time.time()
+    for i in range(args.threads):
+      t = Thread(target=worker, args=(que,))
+      t.daemon = True
+      t.start()
+    que.join()
+    end_time = time.time()
+    logging.info(f'Total time: {end_time - start_time} seconds.')
+    print(f'Total time: {end_time - start_time} seconds.')
