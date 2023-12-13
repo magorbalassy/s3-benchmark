@@ -8,10 +8,18 @@ from queue import Queue
 MAX_THREADS = 100
 
 class S3:
-  """ S3 class for the operations
-  list_bucket_objects: list all objects in a bucket's root
-  put_object: upload an object to a bucket
-  delete_object: delete an object from a bucket
+  """ A class to represent some S3 operations
+  
+  Methods
+  -------
+  list_bucket_objects(bucket):
+    List all objects in a bucket's root
+    
+  put_object(bucket, local_file, remote_file, prefix):
+    Upload an object to a bucket
+    
+  delete_object(bucket, remote_object):
+    Delete an object from a bucket
   """
   def __init__(self, endpoint, access_key, secret):
     self.resource = boto3.resource(
