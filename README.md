@@ -11,7 +11,7 @@ Example command:
 python3 s3-benchmark.py standalone -t 1 -e http://my.minio.local:9000 -k $key -s $secret   -sz=1M -n 20
 ```
 
-Or the longer version:
+Or the not-abbreviated parameters version:
 
 ```
 python3 s3-benchmark.py standalone --threads 1 --endpoint http://my.minio.local:9000 --key $key --secret $secret   --size 1M --number 20
@@ -52,7 +52,10 @@ optional arguments:
 
 ## Standalone
 
-usage: s3-benchmark.py standalone [-h] [-t [THREADS]] -e ENDPOINT -k KEY -s SECRET -b BUCKET [-p PREFIX] [-sz SIZE] -o OPERATION -n NUMBER
+Usage: 
+```
+s3-benchmark.py standalone [-h] [-t [THREADS]] -e ENDPOINT -k KEY -s SECRET -b BUCKET [-p PREFIX] [-sz SIZE] -o OPERATION -n NUMBER
+```
 
 Arguments in `standalone` mode:
 -  -h, --help  
